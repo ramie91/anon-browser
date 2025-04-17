@@ -1,5 +1,5 @@
 import { useState, useRef, forwardRef, useContext, useEffect } from 'react'; // Added useContext, useEffect
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Platform, Button } from 'react-native';
 import { WebView as RNWebView, WebViewNavigation, WebViewProps } from 'react-native-webview';
 import { Search, X, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { BrowserContext } from '../../context/BrowserContext'; // Import context
@@ -123,6 +123,15 @@ export default function BrowserScreen() {
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <Text style={styles.loadingText}>Loading...</Text>
+          <TouchableOpacity
+            style={styles.cancelButton} // Add a style for the button
+            onPress={() => {
+              localWebViewRef.current?.stopLoading(); // Stop the WebView loading
+              setIsLoading(false); // Hide the overlay
+            }}
+          >
+            <Text style={styles.cancelButtonText}>Annuler</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -182,5 +191,16 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#fff',
     fontSize: 16,
+  },
+  cancelButton: { // Style for the TouchableOpacity button
+    backgroundColor: '#555',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  cancelButtonText: { // Style for the button text
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

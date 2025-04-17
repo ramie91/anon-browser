@@ -151,7 +151,15 @@ export default function BrowserScreen() {
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <Text style={styles.loadingText}>Loading...</Text>
-          <Button title="Annuler" onPress={() => setIsLoading(false)} />
+          <TouchableOpacity
+            style={styles.cancelButton} // Add a style for the button
+            onPress={() => {
+              localWebViewRef.current?.stopLoading(); // Stop the WebView loading
+              setIsLoading(false); // Hide the overlay
+            }}
+          >
+            <Text style={styles.cancelButtonText}>Annuler</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -211,5 +219,17 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#fff',
     fontSize: 16,
+    marginBottom: 15, // Add some space below the text
+  },
+  cancelButton: { // Style for the TouchableOpacity button
+    backgroundColor: '#555',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  cancelButtonText: { // Style for the button text
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

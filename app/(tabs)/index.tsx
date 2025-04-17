@@ -1,11 +1,30 @@
-import { useState, useRef, forwardRef, useContext, useEffect } from 'react'; // Added useContext, useEffect
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
+import { useState, useRef, forwardRef, useContext, useEffect } from 'react';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Platform, Button, NativeModules } from 'react-native'; // Import NativeModules
 import { WebView as RNWebView, WebViewNavigation, WebViewProps } from 'react-native-webview';
 import { Search, X, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { BrowserContext } from '../../context/BrowserContext'; // Import context
 
 // Wrap RNWebView with forwardRef and explicit types
 const WebView = forwardRef<RNWebView, WebViewProps>((props, ref) => <RNWebView {...props} ref={ref} />);
+
+// Get the native module
+const { WebViewDataManager } = NativeModules;
+
+// Function to clear WebView data on iOS
+const clearWebViewData = async () => {
+  if (Platform.OS === 'ios' && WebViewDataManager) {
+    try {
+      console.log('Attempting to clear WebView data via native module...');
+      await WebViewDataManager.clearAllWebViewData();
+      console.log('WebView data cleared successfully.');
+    } catch (error) {
+      console.error('Failed to clear WebView data:', error);
+    }
+  } else {
+    console.log('Skipping WebView data clear (not iOS or module unavailable).');
+  }
+};
+
 
 export default function BrowserScreen() {
   // url controls the TextInput, submittedUrl controls the WebView/iframe
@@ -17,6 +36,15 @@ export default function BrowserScreen() {
   const localWebViewRef = useRef<RNWebView | null>(null); // Local ref for internal use
   // Get setter and resetKey from context
   const { setWebViewRefInstance, resetKey } = useContext(BrowserContext);
+
+  // Effect to clear data on unmount
+  useEffect(() => {
+    // Return the cleanup function
+    return () => {
+      clearWebViewData();
+    };
+  }, []); // Empty dependency array ensures this runs only on mount and unmount
+
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -123,6 +151,7 @@ export default function BrowserScreen() {
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <Text style={styles.loadingText}>Loading...</Text>
+          <Button title="Annuler" onPress={() => setIsLoading(false)} />
         </View>
       )}
     </View>
